@@ -1,0 +1,33 @@
+# Rquires the following files from nauty27r1:
+#	gtools.c
+#	gtools.h
+#	naurng.h
+#	nausparse.c
+#	nausparse.h
+#	nautil.c
+#	naututil.h
+#	planarity.c
+#	planrity.h
+#	sorttemplates.c
+
+CC=/usr/bin/gcc
+CFLAGS=-O4 -mpopcnt -march=native
+GTOOLSH=gtools.h nausparse.h naututil.h nauty.h naurng.h
+
+spindle: ${GTOOLSH} spindle.c spinutil.o spinutil.h gtools.o planarity.o nautil.o
+	${CC} -o spindle ${CFLAGS} spindle.c spinutil.o gtools.o planarity.o nautil.o
+
+gtools.o: ${GTOOLSH} gtools.c
+	${CC} -c ${CFLAGS} gtools.c
+
+nautil.o: nauty.h nautil.c sorttemplates.c
+	${CC} -c ${CFLAGS} nautil.c
+
+planarity.o: planarity.c planarity.h
+	${CC} -c ${CFLAGS} planarity.c
+
+spinutil.o: ${GTOOLSH} spinutil.c spinutil.h planarity.h
+	${CC} -c ${CFLAGS} spinutil.c 
+
+clean:
+	rm *.o
