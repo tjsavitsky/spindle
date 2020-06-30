@@ -1,0 +1,53 @@
+--- ../nauty27r1/makefile.in.orig	2020-06-28 14:40:23.362376884 -0400
++++ ../nauty27r1/makefile.in	2020-06-28 17:20:56.962147326 -0400
+@@ -34,7 +34,7 @@
+   directg gentreeg genquarticg underlyingg assembleg gengL \
+   ranlabg multig planarg gentourng linegraphg watercluster2 dretodot \
+   subdivideg vcolg delptg cubhamg twohamg hamheuristic converseg \
+-  genspecialg edgetransg genbgL @shortg_or_null@ ;
++  genspecialg edgetransg genbgL spindle gengplanar gengspin @shortg_or_null@ ;
+ 
+ NAUTYO=nauty.o nautil.o nausparse.o naugraph.o schreier.o naurng.o
+ NAUTY1O=nauty1.o nautil1.o nausparse.o naugraph1.o schreier.o naurng.o
+@@ -191,6 +191,12 @@
+ rng.o: rng.c nauty.h
+ 	${CCOBJ} rng.c
+ 
++planarity.o: planarity.c planarity.h
++	${CCOBJ} planarity.c
++
++spinutil.o: ${GTOOLSH} spinutil.c spinutil.h planarity.h
++	${CCOBJ} spinutil.c
++
+ dreadnaut: dreadnaut.c naututil.o nautinv.o traces.o gtools.o ${NAUTYO}
+ 	${CC} -o dreadnaut ${SAFECFLAGS} dreadnaut.c naututil.o \
+ 		nautinv.o gtools.o traces.o ${NAUTYO} ${LDFLAGS}
+@@ -319,6 +325,18 @@
+ 	${CC} -o geng ${CFLAGS} ${W1} geng.c gtoolsW.o nautyW1.o \
+ 		nautilW1.o naugraphW1.o schreier.o naurng.o ${LDFLAGS}
+ 
++gengplanar : ${GTOOLSH} geng.c gtoolsW.o nautyW1.o nautilW1.o naugraphW1.o schreier.o naurng.o \
++            spinutil.o planarity.o spinprune.c
++	${CC} -o gengplanar ${CFLAGS} ${W1} geng.c gtoolsW.o nautyW1.o \
++		nautilW1.o naugraphW1.o schreier.o naurng.o spinutil.o planarity.o spinprune.c ${LDFLAGS} \
++        -DPRUNE=planar_prune
++
++gengspin : ${GTOOLSH} geng.c gtoolsW.o nautyW1.o nautilW1.o naugraphW1.o schreier.o naurng.o \
++            spinutil.o planarity.o spinprune.c
++	${CC} -o gengspin ${CFLAGS} ${W1} geng.c gtoolsW.o nautyW1.o \
++		nautilW1.o naugraphW1.o schreier.o naurng.o spinutil.o planarity.o spinprune.c ${LDFLAGS} \
++        -DPRUNE=spindle_prune
++
+ gengL : ${GTOOLSH} geng.c gtoolsL.o nautyL1.o nautilL1.o naugraphL1.o schreier.o naurng.o
+ 	${CC} -o gengL ${CFLAGS} ${L1} geng.c gtoolsL.o nautyL1.o \
+ 		nautilL1.o naugraphL1.o schreier.o naurng.o ${LDFLAGS}
+@@ -435,6 +453,9 @@
+ 	${CC} -o planarg ${CFLAGS} \
+ 		planarg.c planarity.c gtools.o ${LDFLAGS}
+ 
++spindle: ${GTOOLSH} spindle.c spinutil.o spinutil.h gtools.o planarity.o nautil.o
++	${CC} -o spindle ${CFLAGS} spindle.c spinutil.o gtools.o planarity.o nautil.o
++
+ watercluster2 : ${GTOOLSH} nauty.h watercluster2.c gtoolsW.o ${NAUTYW1O}
+ 	${CC} -o watercluster2 ${CFLAGS} ${W1} watercluster2.c \
+                  gtoolsW.o ${NAUTYW1O} ${LDFLAGS}
