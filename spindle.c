@@ -208,5 +208,7 @@ main(int argc, char *argv[])
         fprintf(stderr,"\n");
     }
 
+    SG_FREE(sg);
+
     return 0;
 }
