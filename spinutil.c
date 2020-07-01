@@ -120,11 +120,21 @@ va_from_sg(sparsegraph *sg_ptr, t_ver_sparse_rep *V, t_adjl_sparse_rep *A)
 
 /*************************************************************************/
 
-boolean
-is_planar_va(t_ver_sparse_rep *V, int n, t_adjl_sparse_rep *A)
+/* If (V,A) is nonplanar and get_Ksg is TRUE, then a Kuratowski subgraph
+   will be returned in (VK, AK), and its number of edges in nbr_e_obs.
+   However, vertices in the subgraph that  not in the original graph will
+   have degree 0 in the subgraph, rather than be truly deleted.
+   
+   If get_Ksg is TRUE, assumes that (VK, AK) and nbr_e_obs have been
+   allocated by the caller.
+*/
+static boolean
+boyer_myrvold(t_ver_sparse_rep *V, int n, t_adjl_sparse_rep *A,
+                boolean get_Ksg, t_ver_sparse_rep **VK,
+                t_adjl_sparse_rep **AK, int *nbr_e_obs)
 {
     t_dlcl          **dfs_tree, **back_edges, **mult_edges;
-    int             c, edge_pos, v, w;
+    int             c, edge_pos, vr, wr;
     boolean         ans;
     t_ver_edge      *embed_graph;
 
@@ -136,10 +146,17 @@ is_planar_va(t_ver_sparse_rep *V, int n, t_adjl_sparse_rep *A)
           e: number of edges
           
       The number of components is returned in c.
+
+      If the graph is nonplanar, edge (vr,wr) is the unembedded edge.
     */
     ans = sparseg_adjl_is_planar(V, n, A, &c,
                                  &dfs_tree, &back_edges, &mult_edges,
-                                 &embed_graph, &edge_pos, &v, &w);
+                                 &embed_graph, &edge_pos, &vr, &wr);
+
+    if (!ans && get_Ksg)
+        embedg_obstruction(V, A, dfs_tree, back_edges,
+                           embed_graph, n, &edge_pos,
+                           vr, wr, VK, AK, nbr_e_obs);
         
     sparseg_dlcl_delete(dfs_tree, n);
     sparseg_dlcl_delete(back_edges, n);
@@ -147,6 +164,14 @@ is_planar_va(t_ver_sparse_rep *V, int n, t_adjl_sparse_rep *A)
     embedg_VES_delete(embed_graph, n);
  
     return ans;
+}
+
+/*************************************************************************/
+
+boolean
+is_planar_va(t_ver_sparse_rep *V, int n, t_adjl_sparse_rep *A)
+{
+    return boyer_myrvold(V, n, A, FALSE, NULL, NULL, NULL);
 }
 
 /*************************************************************************/
@@ -460,48 +485,68 @@ is_spindle_va(t_ver_sparse_rep *V, int n, t_adjl_sparse_rep *A, int ne)
 {
     DYNALLSTAT(t_ver_sparse_rep,Vdel,Vdel_sz);
     DYNALLSTAT(t_adjl_sparse_rep,Adel,Adel_sz);
+
     DYNALLSTAT(t_ver_sparse_rep,Vsplit,V_sz);
     DYNALLSTAT(t_adjl_sparse_rep,Asplit,A_sz);
-    int i, j, k, e, end, d, u;
+
+    DYNALLSTAT(t_ver_sparse_rep,VKsg,VKsg_sz);
+    DYNALLSTAT(t_adjl_sparse_rep,AKsg,AKsg_sz);
+
+    DYNALLSTAT(boolean,nosplit,nosplit_sz);
+    int i, j, k, e, end, ne_obs, u, d;
     setword mask;
 
+    DYNALLOC1(t_ver_sparse_rep,VKsg,VKsg_sz,n,"spindle");
+    DYNALLOC1(t_adjl_sparse_rep,AKsg,AKsg_sz,2*ne+1,"spindle");
+
     /* planar graphs are spindle */
-    if (is_planar_va(V, n, A))
+    if (boyer_myrvold(V, n, A, TRUE, &VKsg, &AKsg, &ne_obs))
         return TRUE;
 
+    DYNALLOC1(boolean,nosplit,nosplit_sz,n,"spindle");
+
+    /* There's point in attempting to split a vertex that lies outside of
+       some Kuratowski subgraph. */
+    for (i = 0; i < n; ++i)
+        if (vertex_deg_va(i, VKsg, AKsg) == 0)
+            nosplit[i] = TRUE;
+        else
+            nosplit[i] = FALSE;
     
-    /* if some deletion of the graph is planar, then the graph is spindle */
+    /* If some deletion of the graph is planar, then the graph is spindle.
+       We need only check deletions of edges in the Kuratowski subgraph
+       returned above. */
     DYNALLOC1(t_ver_sparse_rep,Vdel,Vdel_sz,n,"spindle");
     DYNALLOC1(t_adjl_sparse_rep,Adel,Adel_sz,2*ne+1,"spindle");
 
     k = 0;
     for (i = 0; i < n; ++i)
     {
-        e = V[i].first_edge;
+        e = VKsg[i].first_edge;
         while (e != NIL)
         {
-            if (i < A[e].end_vertex)
+            if (i < AKsg[e].end_vertex)
             /* Only test deletion of edges (u,v) where u<v.
                Deleting a loop can't make a nonplanar graph planar.
             */
             {
                 va_copy(V, Vdel, n, A, Adel);
 
-                end = A[e].end_vertex;
-                d = delete_suppress_va(i, end, Vdel, n, Adel);
+                end = AKsg[e].end_vertex;
+                sparseg_adjl_remove_edge_no_red(Vdel, Adel, i, end);
 
-                if (is_planar_va(Vdel, n-d, Adel))
+                if (is_planar_va(Vdel, n, Adel))
                     return TRUE;
 
                 ++k;
             }
-            e = A[e].next;
+            e = AKsg[e].next;
         }
     }
 
 #ifdef SPINDLE_CHECKS
     /* m is now merely an upper bound on the number of edges in (V,A) */
-    if (k > ne)
+    if (k != ne_obs)
     {
         fprintf(stderr,">E spindle: is_spindle_va error\n");
         fprintf(stderr,"k=%d ne=%d\n",k,ne);
@@ -509,15 +554,15 @@ is_spindle_va(t_ver_sparse_rep *V, int n, t_adjl_sparse_rep *A, int ne)
     }
 #endif /* SPINDLE_CHECKS */
 
-
-    /* if some split a vertex is planar, then the graph is spindle */
-
+    /* if some split of a vertex is planar, then the graph is spindle */
 
     DYNALLOC1(t_ver_sparse_rep,Vsplit,V_sz,n+1,"spindle");
     DYNALLOC1(t_adjl_sparse_rep,Asplit,A_sz,2*ne+1,"spindle");
 
     for (i = 0; i < n; ++i)
     {
+        if (nosplit[i]) continue;
+
         /* iterate through half the subsets of N(i) 
            ignore subsets of size 1, which are equivalent to deletions
            for embedabbility.  ignore subsets of size 0. */
@@ -537,8 +582,6 @@ is_spindle_va(t_ver_sparse_rep *V, int n, t_adjl_sparse_rep *A, int ne)
             exit(1);
         }
     
-        int a, b;
-        setword t,v,w;
         if (d % 2 == 0)
             u = d/2-1;
         else
