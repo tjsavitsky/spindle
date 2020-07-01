@@ -489,16 +489,15 @@ is_spindle_va(t_ver_sparse_rep *V, int n, t_adjl_sparse_rep *A, int ne)
     DYNALLSTAT(t_ver_sparse_rep,Vsplit,V_sz);
     DYNALLSTAT(t_adjl_sparse_rep,Asplit,A_sz);
 
-    DYNALLSTAT(t_ver_sparse_rep,VKsg,VKsg_sz);
-    DYNALLSTAT(t_adjl_sparse_rep,AKsg,AKsg_sz);
-
     DYNALLSTAT(boolean,nosplit,nosplit_sz);
+
+    t_ver_sparse_rep *VKsg;
+    t_adjl_sparse_rep *AKsg;
     int i, j, k, e, end, ne_obs, u, d;
     setword mask;
 
-    DYNALLOC1(t_ver_sparse_rep,VKsg,VKsg_sz,n,"spindle");
-    DYNALLOC1(t_adjl_sparse_rep,AKsg,AKsg_sz,2*ne+1,"spindle");
-
+    VKsg = NULL;
+    AKsg = NULL;
     /* planar graphs are spindle */
     if (boyer_myrvold(V, n, A, TRUE, &VKsg, &AKsg, &ne_obs))
         return TRUE;
@@ -543,6 +542,9 @@ is_spindle_va(t_ver_sparse_rep *V, int n, t_adjl_sparse_rep *A, int ne)
             e = AKsg[e].next;
         }
     }
+
+    FREES(VKsg);
+    FREES(AKsg);
 
 #ifdef SPINDLE_CHECKS
     if (k != ne_obs)
