@@ -545,7 +545,6 @@ is_spindle_va(t_ver_sparse_rep *V, int n, t_adjl_sparse_rep *A, int ne)
     }
 
 #ifdef SPINDLE_CHECKS
-    /* m is now merely an upper bound on the number of edges in (V,A) */
     if (k != ne_obs)
     {
         fprintf(stderr,">E spindle: is_spindle_va error\n");
