@@ -1,6 +1,6 @@
-spindle is like planarg, but it tests for embeddability
-in the spindle surface.  It also tests for topological
-and excluded minors for the spindle surface.
+spindle was modified from planarg.  It tests for embeddability
+in the spindle surface rather than planarity.  It also tests for
+being a topological obstruction or excluded minor for the spindle surface.
 
 gengplanar is just like geng, except it only generates
 planar graphs.
@@ -29,5 +29,7 @@ Then copy the file files to the nauty directory:
 Now you should be able to make spindle and gengplanar
 and gengspin with the rest of nauty.
 
-These have only been tested with nauty27r1.
+These programs have only been tested with nauty27r1.
 
+--Thomas J. Savitsky
+July 1, 2020
