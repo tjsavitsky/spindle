@@ -130,8 +130,8 @@ va_from_sg(sparsegraph *sg_ptr, t_ver_sparse_rep *V, t_adjl_sparse_rep *A)
 */
 static boolean
 boyer_myrvold(t_ver_sparse_rep *V, int n, t_adjl_sparse_rep *A,
-                boolean get_Ksg, t_ver_sparse_rep **VK,
-                t_adjl_sparse_rep **AK, int *nbr_e_obs)
+                boolean get_Ksg, t_ver_sparse_rep **VK_ptr,
+                t_adjl_sparse_rep **AK_ptr, int *nbr_e_obs)
 {
     t_dlcl          **dfs_tree, **back_edges, **mult_edges;
     int             c, edge_pos, vr, wr;
@@ -156,7 +156,7 @@ boyer_myrvold(t_ver_sparse_rep *V, int n, t_adjl_sparse_rep *A,
     if (!ans && get_Ksg)
         embedg_obstruction(V, A, dfs_tree, back_edges,
                            embed_graph, n, &edge_pos,
-                           vr, wr, VK, AK, nbr_e_obs);
+                           vr, wr, VK_ptr, AK_ptr, nbr_e_obs);
         
     sparseg_dlcl_delete(dfs_tree, n);
     sparseg_dlcl_delete(back_edges, n);
@@ -534,8 +534,11 @@ is_spindle_va(t_ver_sparse_rep *V, int n, t_adjl_sparse_rep *A, int ne)
                 end = AKsg[e].end_vertex;
                 sparseg_adjl_remove_edge_no_red(Vdel, Adel, i, end);
 
-                if (is_planar_va(Vdel, n, Adel))
+                if (is_planar_va(Vdel, n, Adel)) {
+                    FREES(VKsg);
+                    FREES(AKsg);
                     return TRUE;
+                }
 
                 ++k;
             }
