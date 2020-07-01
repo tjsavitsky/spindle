@@ -744,17 +744,17 @@ is_topological_obstruction_sg(sparsegraph *sg_ptr, int nloops)
 
 boolean
 is_excluded_minor_va(t_ver_sparse_rep *V, int n,
-                                t_adjl_sparse_rep *A, int m)
+                                t_adjl_sparse_rep *A, int ne)
 {
     DYNALLSTAT(t_ver_sparse_rep,Vcon,Vcon_sz);
     DYNALLSTAT(t_adjl_sparse_rep,Acon,Acon_sz);
     int i, d, k, e, end;
 
-    if (!is_topological_obstruction_va(V, n, A, m))
+    if (!is_topological_obstruction_va(V, n, A, ne))
         return FALSE;
 
     DYNALLOC1(t_ver_sparse_rep,Vcon,Vcon_sz,n,"spindle");
-    DYNALLOC1(t_adjl_sparse_rep,Acon,Acon_sz,2*m+1,"spindle");
+    DYNALLOC1(t_adjl_sparse_rep,Acon,Acon_sz,2*ne+1,"spindle");
 
     /* test all contractions */
     k = 0;
@@ -771,7 +771,7 @@ is_excluded_minor_va(t_ver_sparse_rep *V, int n,
 
                 d = contract_edge_va(i, end, Vcon, n, Acon, TRUE);
 
-                if (!is_spindle_va(Vcon, n-d, Acon, m-1))
+                if (!is_spindle_va(Vcon, n-d, Acon, ne-1))
                     return FALSE;
                 ++k;
             }
@@ -780,10 +780,10 @@ is_excluded_minor_va(t_ver_sparse_rep *V, int n,
     }
 
 #ifdef SPINDLE_CHECKS
-    if (k != m)
+    if (k != ne)
     {
-        fprintf(stderr,">E spindle: is_topological_obstruction error\n");
-        fprintf(stderr,"k=%d m=%d\n",k,m);
+        fprintf(stderr,">E spindle: is_excluded_minor_va error\n");
+        fprintf(stderr,"k=%d ne=%d\n",k,ne);
         exit(1);
     }
 #endif /* SPINDLE_CHECKS */
