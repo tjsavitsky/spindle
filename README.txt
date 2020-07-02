@@ -1,3 +1,8 @@
+The source contained here can be used to build programs to test
+for embeddability in the spindle surface.  They are based on,
+and require, the source for nauty, specifically version nauty27r1,
+which we do not provide.
+
 spindle was modified from planarg.  It tests for embeddability
 in the spindle surface rather than planarity.  It also tests for
 being a topological obstruction or excluded minor for the spindle surface.
@@ -29,7 +34,9 @@ Then copy the file files to the nauty directory:
 Now you should be able to make spindle and gengplanar
 and gengspin with the rest of nauty.
 
-These programs have only been tested with nauty27r1.
+Files containing all excluded minors and topological obstructions
+known to us for the spindle surface are also provided in graph6
+format.
 
 --Thomas J. Savitsky
-July 1, 2020
+July 2, 2020
