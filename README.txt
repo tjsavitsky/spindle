@@ -11,7 +11,11 @@ gengplanar is just like geng, except it only generates
 planar graphs.
 
 gengspin is just like gengspin, except it only
-generates graphs that embed in the spindle surface
+generates graphs that embed in the spindle surface.
+
+splitvg generates all vertex splits (i.e. coextensions) of
+a graph.  This is perhaps useful for finding topological obstructions,
+particularly with the -d3 flag.
 
 The script filter_tobs.sh gives an example of
 how to harness harness Gnu Parallel
@@ -30,13 +34,14 @@ Then copy the file files to the nauty directory:
 	spinutil.c
 	spinutil.h
 	spinprune.c
+    splitvg.c
 
-Now you should be able to make spindle and gengplanar
-and gengspin with the rest of nauty.
+Now you should be able to make spindle, gengplanar, gengspin,
+and splitvg with the rest of nauty.
 
 Files containing all excluded minors and topological obstructions
 known to us for the spindle surface are also provided in graph6
 format.
 
---Thomas J. Savitsky
+--Thomas J. Savitsky (savitsky@gwmail.gwu.edu)
 July 2, 2020

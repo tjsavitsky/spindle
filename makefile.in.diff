@@ -1,7 +1,11 @@
 --- ../nauty27r1/makefile.in.orig	2020-06-28 14:40:23.362376884 -0400
-+++ ../nauty27r1/makefile.in	2020-06-28 17:20:56.962147326 -0400
-@@ -34,7 +34,7 @@
-   directg gentreeg genquarticg underlyingg assembleg gengL \
++++ ./makefile.in	2020-07-05 10:56:34.945766260 -0400
+@@ -31,10 +31,10 @@
+ 
+ gtools : copyg listg labelg dretog amtog geng complg showg NRswitchg \
+   biplabg addedgeg deledgeg countg pickg genrang newedgeg catg genbg \
+-  directg gentreeg genquarticg underlyingg assembleg gengL \
++  splitvg directg gentreeg genquarticg underlyingg assembleg gengL \
    ranlabg multig planarg gentourng linegraphg watercluster2 dretodot \
    subdivideg vcolg delptg cubhamg twohamg hamheuristic converseg \
 -  genspecialg edgetransg genbgL @shortg_or_null@ ;
@@ -41,7 +45,18 @@
  gengL : ${GTOOLSH} geng.c gtoolsL.o nautyL1.o nautilL1.o naugraphL1.o schreier.o naurng.o
  	${CC} -o gengL ${CFLAGS} ${L1} geng.c gtoolsL.o nautyL1.o \
  		nautilL1.o naugraphL1.o schreier.o naurng.o ${LDFLAGS}
-@@ -435,6 +453,9 @@
+@@ -409,6 +427,10 @@
+ 	${CC} -o addedgeg ${CFLAGS} addedgeg.c gtools.o gtnauty.o \
+ 	        gutil1.o ${NAUTYO} ${LDFLAGS}
+ 
++splitvg : ${GTOOLSH} gutils.h splitvg.c gtools.o gtnauty.o gutil1.o ${NAUTYO}
++	${CC} -o splitvg ${CFLAGS} splitvg.c gtools.o gtnauty.o \
++	        gutil1.o ${NAUTYO} ${LDFLAGS}
++
+ newedgeg : ${GTOOLSH} gutils.h newedgeg.c gtools.o gtnauty.o ${NAUTYO}
+ 	${CC} -o newedgeg ${CFLAGS} newedgeg.c gtools.o gtnauty.o \
+ 		 ${NAUTYO} ${LDFLAGS}
+@@ -435,6 +457,9 @@
  	${CC} -o planarg ${CFLAGS} \
  		planarg.c planarity.c gtools.o ${LDFLAGS}
  

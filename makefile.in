@@ -31,7 +31,7 @@ nauty : dreadnaut nauty.a nauty1.a nautyW.a nautyW1.a nautyL.a nautyL1.a;
 
 gtools : copyg listg labelg dretog amtog geng complg showg NRswitchg \
   biplabg addedgeg deledgeg countg pickg genrang newedgeg catg genbg \
-  directg gentreeg genquarticg underlyingg assembleg gengL \
+  splitvg directg gentreeg genquarticg underlyingg assembleg gengL \
   ranlabg multig planarg gentourng linegraphg watercluster2 dretodot \
   subdivideg vcolg delptg cubhamg twohamg hamheuristic converseg \
   genspecialg edgetransg genbgL spindle gengplanar gengspin @shortg_or_null@ ;
@@ -425,6 +425,10 @@ delptg : ${GTOOLSH} delptg.c gtools.o gtnauty.o ${NAUTYO}
 
 addedgeg : ${GTOOLSH} gutils.h addedgeg.c gtools.o gtnauty.o gutil1.o ${NAUTYO}
 	${CC} -o addedgeg ${CFLAGS} addedgeg.c gtools.o gtnauty.o \
+	        gutil1.o ${NAUTYO} ${LDFLAGS}
+
+splitvg : ${GTOOLSH} gutils.h splitvg.c gtools.o gtnauty.o gutil1.o ${NAUTYO}
+	${CC} -o splitvg ${CFLAGS} splitvg.c gtools.o gtnauty.o \
 	        gutil1.o ${NAUTYO} ${LDFLAGS}
 
 newedgeg : ${GTOOLSH} gutils.h newedgeg.c gtools.o gtnauty.o ${NAUTYO}
