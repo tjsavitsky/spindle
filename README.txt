@@ -46,4 +46,4 @@ known to us for the spindle surface are also provided in graph6
 format.
 
 --Thomas J. Savitsky (savitsky@gwmail.gwu.edu)
-July 2, 2020
+July 10, 2020
