@@ -1,7 +1,9 @@
 The source contained here can be used to build programs to test
 for embeddability in the spindle surface.  They are based on,
 and require, the source for nauty, specifically version nauty27r1,
-which we do not provide.
+which we do not provide.  The latest release of nauty
+is available at the following website:
+http://http://pallini.di.uniroma1.it/
 
 spindle was modified from planarg.  It tests for embeddability
 in the spindle surface rather than planarity.  It also tests for
@@ -29,12 +31,12 @@ To build the programs first extract nauty.  Then
 copy makefile.in to the nauty directory (or apply
 the makefile.in.diff patch) and configure.
 
-Then copy the file files to the nauty directory:
+Then copy the following files to the nauty directory:
 	spindle.c
 	spinutil.c
 	spinutil.h
 	spinprune.c
-    splitvg.c
+	splitvg.c
 
 Now you should be able to make spindle, gengplanar, gengspin,
 and splitvg with the rest of nauty.
