@@ -1,9 +1,9 @@
 The source contained here can be used to build programs to test
 for embeddability in the spindle surface.  They are based on,
 and require, the source for nauty, specifically version nauty27r1,
-which we do not provide.  The latest release of nauty
-is available at the following website:
-http://http://pallini.di.uniroma1.it/
+which we do not provide.  We point to the following website
+for the latest release of nauty:
+http://pallini.di.uniroma1.it/
 
 spindle was modified from planarg.  It tests for embeddability
 in the spindle surface rather than planarity.  It also tests for
